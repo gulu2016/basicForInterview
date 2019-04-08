@@ -62,13 +62,13 @@
         (1.2)每个操作数据的方法都进行同步控制之后，由此带来的问题任何一个时刻只能有一个线程可以操纵Hashtable，所以其效率比较低。
     (2)继承的父类不同
        [参考博客](https://www.cnblogs.com/williamjie/p/9099141.html)
-    (3)内部实现使用的数组初始化和扩容方式不同
+    (3)内部实现使用的数组初始化和扩容方式不同,HashMap是size*2,HashTable是size*2+1
     (4)hash值不同:哈希值的使用不同，HashTable直接使用对象的hashCode。而HashMap重新计算hash值。
-3.HashSet的底层实现，是不是线程安全的
+5.HashSet的底层实现，是不是线程安全的
    - [参考博客](https://www.cnblogs.com/skillking/p/7250606.html)
    - 底层使用HashMap来保存HashSet中所有元素。 
    - 不是线程安全的
-4.ArrayList和LinkedList的区别，是不是线程安全的
+6.ArrayList和LinkedList的区别，是不是线程安全的
    - [参考博客](https://www.cnblogs.com/sierrajuan/p/3639353.html)
    - ArrayList和Vector使用了数组的实现，可以认为ArrayList或者Vector封装了对内部数组的操作
    - LinkedList使用了循环双向链表数据结构。
