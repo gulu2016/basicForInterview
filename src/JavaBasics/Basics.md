@@ -1,4 +1,5 @@
 ### 面试的java基础
+
 1.String、StringBuffer、StringBuilder的区别
    - [参考博客](https://www.cnblogs.com/xudong-bupt/p/3961159.html)
    - 可变与不可变
@@ -9,9 +10,11 @@
      StringBuffer是线程安全的
      StringBuilder是线程不安全的
      (StringBuffer和StringBuilder是继承共同父类AbstractStringBuilder的)
+
 2.怎么理解String不变性 
    -  String 是不可变的对象, 因此在每次对 String 类型进行改变的时候其实都等同于生成了一个
       新的 String 对象，然后将指针指向新的 String 对象
+
 3.==和equals的区别，如果重写了equals()不重写hashCode()会发生什么
    - [参考博客](https://www.cnblogs.com/smyhvae/p/3929585.html)
    - == 的作用：
@@ -37,10 +40,12 @@
      [参考博客](https://www.cnblogs.com/ouym/p/8963219.html)
      这是为了遵守：2个对象equals，那么 hashCode一定相同规则
      否则会出现两个对象equals返回true，但是存储在hashMap的不同位置
+
 4.java为什么不能多继承 
    - [参考博客](https://blog.csdn.net/qq_36084640/article/details/83903252)
    - 不能多继承是因为可能出现调用歧义
    - 可以多实现是因为即使接口有相同方法，在子类中也要实现，调用的还是子类中的方法
+
 5.讲一下java抽象类和接口 
    - [参考博客](http://www.importnew.com/12399.html)
    - 抽象类和接口的对比(抽象类vs接口)
@@ -53,6 +58,7 @@
    - 如果你拥有一些方法并且想让它们中的一些有默认实现，那么使用抽象类吧。
      如果你想实现多重继承，那么你必须使用接口。
    - 总结：除了上边的四点对比，接口是一种行为(走，跑)，抽象类是一种类型(动物，水果)
+
 6.java中为什么要写非static方法
    - [参考博客](https://blog.csdn.net/shengzhu1/article/details/70233057) 
    - 静态方法和非静态方法的区别
@@ -66,5 +72,6 @@
    - 总结就是
      (1)static方法占用内存，不会自动销毁
      (2)静态方法是共享的代码段，可能出现线程安全的问题
+
 7.讲一下java IO
    - [参考博客](https://www.cnblogs.com/fysola/p/6123947.html)
