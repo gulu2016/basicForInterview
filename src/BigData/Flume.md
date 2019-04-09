@@ -1,0 +1,1 @@
+30.flume框架的原理，soure有哪些？sink有哪些？ 
