@@ -5,7 +5,7 @@
 
 #### 基础知识
 
-- 以下问题参考此博客[参考博客](https://www.cnblogs.com/dolphin0520/p/3920373.html)
+- 以下知识点(1-5)参考此博客[参考博客](https://www.cnblogs.com/dolphin0520/p/3920373.html)
 
 1.缓存一致性协议和总线锁机制
   - 出现原因：多个cpu操作共享变量会出现数据一致性问题
@@ -55,11 +55,69 @@
 5.使用volatile的场景
   - 状态标记量 
   - 单例模式中的double check（具体参考博客）
-    
+  
+- 以下知识点(6)参考此博客[参考博客](https://www.cnblogs.com/baizhanshi/p/6419268.html)
 
-1.volatile怎么保证可见性，synchronized和lock的区别，synchronized的底层实现
- 
-2.sleep和wait的区别，sleep会不会释放锁，notify和notifyAll的区别 
+6.synchronized的缺陷
+  - 缺陷：获取锁的进程被阻塞了，但是又没有释放锁，那么其他线程便只能干巴巴地等待
+  - Lock可以不让等待的线程一直无期限地等待下去（比如只等待一定的时间或者能够响应中断）
+  
+7.各种锁的函数用法参看上边的博客
+  - void lock();
+    void lockInterruptibly() throws InterruptedException;
+    boolean tryLock();
+    boolean tryLock(long time, TimeUnit unit) throws InterruptedException;
+    void unlock();
+    Condition newCondition();
+    
+8.锁的几个概念：可重入，可中断锁，公平锁
+  - 可重入：锁基于线程的分配，而不是基于方法调用的分配。也就是一个线程获取到该锁之后，在其中再次需要该锁的时候
+    不需要重新申请该锁。
+  - 可中断锁：如果某一线程A正在执行锁中的代码，另一线程B正在等待获取该锁，可能由于等待时间过长，线程B不想等待
+    了，想先处理其他事情，我们可以让它中断自己或者在别的线程中中断它，这种就是可中断锁。
+  - 公平锁：即尽量以请求锁的顺序来获取锁，先到先得。
+    
+9.读写锁
+  - 读写锁将对一个资源（比如文件）的访问分成了2个锁，一个读锁和一个写锁。
+    正因为有了读写锁，才使得多个线程之间的读操作不会发生冲突。
+    
+#### 面试问题以及解答
+
+1.volatile怎么保证可见性
+  > （1）线程1修改值（2）volatile强制将修改的值立即写入主存（3）线程2缓存变量无效
+    （4）线程2重新读取变量
+
+2.synchronized和lock的区别
+  - [参考博客](https://www.cnblogs.com/iyyy/p/7993788.html)
+  - 在jvm层面：synchronized是java内置关键字,Lock是个java接口
+  - synchronized无法判断是否获取锁的状态，Lock可以判断是否获取到锁(获取不到返回false)
+  - synchronized会自动释放锁，Lock需在finally中手工释放锁
+     >synchronized会自动释放锁时机：a 线程执行完同步代码会释放锁 ；b 线程执行过程中发生异常会释放锁
+  - 用synchronized关键字的两个线程1和线程2，如果当前线程1获得锁，线程2线程等待。如果线程1阻塞，线程2则会一直等待下去；
+    Lock锁就不一定会等待下去，如果尝试获取不到锁，线程可以不用一直等待就结束了；
+  - synchronized的锁可重入、不可中断、非公平，而Lock锁可重入、可中断、可公平（两者皆可）
+  - Lock锁适合大量同步的代码的同步问题，synchronized锁适合代码少量的同步问题
+  
+
+3.synchronized的底层实现
+  - [参考博客](https://www.cnblogs.com/paddix/p/5367116.html)
+    看此博客的代码示例
+  - synchronized三种用法：
+    （1）修饰普通方法
+    （2）修饰静态方法
+    （3）修饰代码块
+  - Synchronized对代码块同步的原理：(0->1,1++,阻塞)
+    > 每个对象有一个监视器锁（monitor）。
+      当monitor被占用时就会处于锁定状态，线程执行monitorenter指令时尝试获取monitor的所有权
+      1.如果monitor的进入数为0，则该线程进入monitor，然后将进入数设置为1，该线程即为monitor的所有者。    
+      2.如果线程已经占有该monitor，只是重新进入，则进入monitor的进入数加1.
+      3.如果其他线程已经占用了monitor，则该线程进入阻塞状态，直到monitor的进入数为0，再重新尝试获取monitor的所有权。
+  - Synchronized对方法同步的原理(先检查标志位，再申请monitor对象)
+    > 当方法调用时，调用指令将会检查方法的 ACC_SYNCHRONIZED 访问标志是否被设置，
+    如果设置了，执行线程将先获取monitor，获取成功之后才能执行方法体，方法执行完后再释放monitor。
+    在方法执行期间，其他任何线程都无法再获得同一个monitor对象。
+    
+4.sleep和wait的区别，sleep会不会释放锁，notify和notifyAll的区别 
 
 3.了不了解线程的局部变量，讲讲线程池参数 
 
