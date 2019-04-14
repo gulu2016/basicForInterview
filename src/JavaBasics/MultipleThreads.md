@@ -117,26 +117,53 @@
     如果设置了，执行线程将先获取monitor，获取成功之后才能执行方法体，方法执行完后再释放monitor。
     在方法执行期间，其他任何线程都无法再获得同一个monitor对象。
     
-4.sleep和wait的区别，sleep会不会释放锁，notify和notifyAll的区别 
+4.sleep和wait的区别，sleep会不会释放锁
+  - 参考例子
+    [参考博客](https://www.cnblogs.com/hongten/p/hongten_java_sleep_wait.html)
+    参考总结
+    [参考博客](https://www.cnblogs.com/plmnko/archive/2010/10/15/1851854.html)
+  - 对于sleep()方法，我们首先要知道该方法是属于Thread类中的
+    而wait()方法，则是属于Object类中的。
+    > sleep是Thread的静态类方法，谁调用的谁去睡觉，
+      即使在a线程里调用了b的sleep方法，实际上还是a去睡觉，要让b线程睡觉要在b的代码中调用sleep。
+  - sleep方法没有释放锁，而wait方法释放了锁
+    > sleep使用interrupt()强行打断，而wait使用notify()或者notifyAll唤醒
+  - sleep可以在任何地方使用
+    wait，notify和notifyAll只能在同步控制方法或者同步控制块里面使用
+  - sleep必须捕获异常
+    wait，notify和notifyAll不需要捕获异常
 
-3.了不了解线程的局部变量，讲讲线程池参数 
+5.notify和notifyAll的区别 
+  - [参考博客](https://blog.csdn.net/djzhao/article/details/79410229)
+  - notifyAll()方法是唤醒所有 wait 线程
+    notify()方法是只随机唤醒一个 wait 线程
+  - wait()方法:让进程进入该对象的等待池中，不会竞争该对象的锁
+    notify()或者notifyAll()方法：让进程从等待池中进入锁池
+    > (1)锁池:假设线程A已经拥有了某个对象(注意:不是类)的锁，而其它的线程想要调用这个对象的某个synchronized
+      方法(或者synchronized块)，由于这些线程在进入对象的synchronized方法之前必须先获得该对象的锁的拥
+      有权，但是该对象的锁目前正被线程A拥有，所以这些线程就进入了该对象的锁池中。
+      (2)等待池:假设一个线程A调用了某个对象的wait()方法，线程A就会释放该对象的锁后，
+      进入到了该对象的等待池中
+  - [参考博客](https://www.jianshu.com/p/25e243850bd2?appinstall=0)
+   
+6.了不了解线程的局部变量，讲讲线程池参数 
 
-4.什么情况会发生死锁，死锁的处理方法 
+7.什么情况会发生死锁，死锁的处理方法 
 
-5.volatile和synchronized的区别 
+8.volatile和synchronized的区别 
 
-6.synchronized的底层实现 
+9.synchronized的底层实现 
 
-7.线程等待时位于哪个区域，具体讲一下
+10.线程等待时位于哪个区域，具体讲一下
  
-8.java实现多线程的方式 
+11.java实现多线程的方式 
 
-9.进程和线程，Java实现多线程的方式，什么是线程安全，怎么保证多线程线程安全
+12.进程和线程，Java实现多线程的方式，什么是线程安全，怎么保证多线程线程安全
 
-10.可重入锁的可重入性是什么意思，哪些是可重入锁
+13.可重入锁的可重入性是什么意思，哪些是可重入锁
 
-11.为什么要用线程池，线程池的好处
+14.为什么要用线程池，线程池的好处
 
-12.高并发怎么处理（没有回答上来）
+15.高并发怎么处理（没有回答上来）
 
-13.线程池的参数
+16.线程池的参数
