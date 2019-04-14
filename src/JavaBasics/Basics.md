@@ -75,3 +75,11 @@
 
 7.讲一下java IO
    - [参考博客](https://www.cnblogs.com/fysola/p/6123947.html)
+   
+8.Integer a=34556,b=34556;但a==b为false 是因为两个是不同的对象
+  Integer a=3,b=3，则a==b是true
+  [参考博客](https://blog.csdn.net/u011368551/article/details/81219590)
+  原因：
+  这是因为Integer类在内存中有一个值的范围为[-128,127]的对象池。
+  只要Integer对象的值在[-128,127]范围内，都是从这个对象池中取。所以只要是这个范围内的Integer对象，
+  只要值相同，就是同一个对象。那么==的结果，就是true。
