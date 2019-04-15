@@ -138,32 +138,122 @@
   - notifyAll()方法是唤醒所有 wait 线程
     notify()方法是只随机唤醒一个 wait 线程
   - wait()方法:让进程进入该对象的等待池中，不会竞争该对象的锁
-    notify()或者notifyAll()方法：让进程从等待池中进入锁池
+    notify()或者notifyAll()方法：进程从等待池进入锁池
     > (1)锁池:假设线程A已经拥有了某个对象(注意:不是类)的锁，而其它的线程想要调用这个对象的某个synchronized
       方法(或者synchronized块)，由于这些线程在进入对象的synchronized方法之前必须先获得该对象的锁的拥
       有权，但是该对象的锁目前正被线程A拥有，所以这些线程就进入了该对象的锁池中。
       (2)等待池:假设一个线程A调用了某个对象的wait()方法，线程A就会释放该对象的锁后，
       进入到了该对象的等待池中
   - [参考博客](https://www.jianshu.com/p/25e243850bd2?appinstall=0)
+  - 永远都要把wait()放到循环语句里面:因为线程要执行，不仅需要被唤醒，还需要得到对象的锁
+    ```
+        while (mBuf.isFull()) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    ```
+  - 应该尽量使用notifyAll()的原因就是，notify()非常容易导致死锁
+    > 具体死锁过程见博客内容
+      总体来说：是生产者A1生产，notify唤醒了消费者B1，A1结束
+      这时候B1消费notify唤醒了B2,B2发现缓冲区为空继续wait,
+      从此没有人执行notify,而A2和B2就一直在等待。
    
-6.了不了解线程的局部变量，讲讲线程池参数 
+6.线程的局部变量
+  - [参考博客](https://blog.csdn.net/qianyiyiding/article/details/77864118)
+  - 总结：成员变量相互影响，局部变量没有影响
+    如果一个变量是成员变量，那么多个线程对同一个对象的成员变量进行操作时，它们对该成员变量是彼此影响的，
+    也就是说一个线程对成员变量的改变会影响到另一个线程。
+    如果一个变量是局部变量，那么每个线程都会有一个该局部变量的拷贝（即便是同一个对象中的方法的局部变量，
+    也会对每一个线程有一个拷贝），一个线程对该局部变量的改变不会影响到其他线程。
+    ```
+        /**
+         * Java局部变量和成员变量代码演示
+         */
+        public class TTTTTT {
+            public static void main(String[] args)
+            {
+                DemoThread  r = new DemoThread ();
+                Thread t1 = new Thread(r);
+                Thread t2 = new Thread(r);
+                t1.start();
+                t2.start();
+                //可以看到控制打印了20次
+            }
+        }
+        class DemoThread  implements Runnable {
+           // int i;//这里成员变量,两个Thread共享了一个r,所以这里共享了一个i,打印次数一共20次数
+            @Override
+            public void run() {
+                int i=0;//这里的i为局部变量,每个线程自己都有一个i,所以这里不会共享,打印的次数为40次
+                while (true) {
+                    System.out.println("测试打印次数: " + i++);
+                    try {
+                        Thread.sleep((long) Math.random() * 10000);
+                    }
+                    catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    if (20 == i) {
+                        break;
+                    }
+                }
+            }
+        }
+    ```
 
-7.什么情况会发生死锁，死锁的处理方法 
+7.线程池参数 
+  - corePoolSize：核心线程数
+  - queueCapacity：任务队列容量（阻塞队列）
+  - maxPoolSize：最大线程数
+    > 当线程数>=corePoolSize，且任务队列已满时。线程池会创建新线程来处理任务
+      当线程数=maxPoolSize，且任务队列已满时，线程池会拒绝处理任务而抛出异常
 
-8.volatile和synchronized的区别 
+8.死锁产生的必要条件（互不球袋）
+  - 互斥条件：一个资源每次只能被一个进程使用。
+  - 不剥夺条件:进程已获得的资源，在末使用完之前，不能强行剥夺。
+  - 请求与保持条件：一个进程因请求资源而阻塞时，对已获得的资源保持不放。
+  - 循环等待条件:若干进程之间形成一种头尾相接的循环等待资源关系。
 
-9.synchronized的底层实现 
+9.什么情况会发生死锁，死锁的处理方法 
+  - [参考博客](https://blog.csdn.net/qweqwruio/article/details/81359744)
+  - 发生死锁的情况:指两个或多个线程之间，由于互相持有对方需要的锁，而永久处于阻塞的状态
+  
+  - [参考博客](https://www.cnblogs.com/sunting0706/p/5697209.html)
+  - 死锁的处理方法
+     > 预防死锁。该方法是通过设置某些限制条件，去破坏产生死锁的四个必要条件中的一个或几个来预防产生死锁。
+       避免死锁。在资源的动态分配过程中，用某种方法防止系统进入不安全状态，从而可以避免产生死锁。
+       检测死锁。通过检测机构及时地检测出死锁的发生，然后采取适当的措施，把进程从思索中解脱出来。
+       解除死锁。当检测到系统中已发生死锁时，就采取相应的措施，将进程从死锁状态中解脱出来。常用方法是---撤销一些进程，回收他们的资源，将他们分配给已处于阻塞状态的进程，使其能继续运行。
+  - 对应到java的解决方法：一种是用synchronized，一种是用Lock显式锁实现。
+  
+10.volatile和synchronized的区别 
+  - volatile本质是在告诉jvm当前变量在寄存器（工作内存）中的值是不确定的，
+    需要从主存中读取； synchronized则是锁定当前变量，只有当前线程可以访问该变量，其他线程被阻塞住。
+  - volatile仅能使用在变量级别；synchronized则可以使用在变量、方法、和类级别的
+  - volatile仅能实现变量的修改可见性，不能保证原子性；
+    而synchronized则可以保证变量的修改可见性和原子性
+  - volatile不会造成线程的阻塞；synchronized可能会造成线程的阻塞。
+  - volatile标记的变量不会被编译器优化；synchronized标记的变量可以被编译器优化
 
-10.线程等待时位于哪个区域，具体讲一下
+11.线程等待时位于哪个区域
  
-11.java实现多线程的方式 
+12.java实现多线程的方式 
+  - [参考博客](https://www.cnblogs.com/felixzh/p/6036074.html)
+  - 继承Thread类创建线程
+  - 实现Runnable接口创建线程
+  - 实现Callable接口通过FutureTask包装器来创建Thread线程
+  - 使用ExecutorService、Callable、Future实现有返回结果的线程
 
-12.进程和线程，Java实现多线程的方式，什么是线程安全，怎么保证多线程线程安全
+13.进程和线程，什么是线程安全，怎么保证多线程线程安全
 
-13.可重入锁的可重入性是什么意思，哪些是可重入锁
+14.哪些是可重入锁
+  - [参考博客](https://www.cnblogs.com/dj3839/p/6580765.html)
+  - synchronized
+    java.util.concurrent.locks.ReentrantLock
 
-14.为什么要用线程池，线程池的好处
+15.为什么要用线程池，线程池的好处
 
-15.高并发怎么处理（没有回答上来）
-
-16.线程池的参数
+16.高并发怎么处理（没有回答上来）
